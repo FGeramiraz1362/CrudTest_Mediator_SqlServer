@@ -1,0 +1,71 @@
+﻿@page "/customersManager"
+@using System.Net.Http.Json
+@using global::Client.ServiceModel
+@using global::Shared.Dtos
+@inject NavigationManager navigationManager
+@inject HttpClient httpClient
+@inject ICustomerService CustomerService
+
+<MudTd><MudButton Variant="Variant.Outlined" Size="Size.Large" OnClick="@(() => AddCustomer())">AddCustomer</MudButton></MudTd>
+
+<MudTable Items="@Customers" Hover="true" Breakpoint="Breakpoint.Sm">
+
+	<HeaderContent>
+		@* <MudTh >Id</MudTh> *@
+		<MudTh>FirstName</MudTh>
+		<MudTh>LastName</MudTh>
+		<MudTh>Email</MudTh>
+		<MudTh>PhoneNumber_Country</MudTh>
+		<MudTh>PhoneNumber_National</MudTh>
+		<MudTh>BirthDate</MudTh>
+		<MudTh>BankAccountNumber</MudTh>
+	</HeaderContent>
+	<RowTemplate>
+		@* 		<MudTd DataLabel="ID">@context.Id</MudTd>
+		*@			<MudTd DataLabel="FirstName">@context.Name</MudTd>
+		<MudTd DataLabel="LastName">@context.Family</MudTd>
+		<MudTd DataLabel="Email">@context.Email</MudTd>
+		<MudTd DataLabel="PhoneNumber_Country">@context.CountryCode</MudTd>
+		<MudTd DataLabel="PhoneNumber_National">@context.MobileNumber</MudTd>
+
+		<MudTd DataLabel="BirthDate">@context.BirthDate.Date</MudTd>
+		<MudTd DataLabel="BankAccountNumber">@context.BankAccounNumber</MudTd>
+		<MudTd><MudButton Variant="Variant.Outlined" Size="Size.Small" OnClick="@(() => DeleteCustomer(context.Id))">Delete</MudButton></MudTd>
+		<MudTd><MudButton Variant="Variant.Outlined" Size="Size.Small" OnClick="@(() => UpdateCustomer(context.Id))">Update</MudButton></MudTd>
+
+
+	</RowTemplate>
+	
+</MudTable>
+
+@code {
+	private CustomerDto[] Customers;
+
+
+	protected override async Task OnInitializedAsync()//todo:pageing
+	{
+		Customers = await CustomerService.GetCustomers();
+	}
+
+
+	async Task DeleteCustomer(int id)
+	{
+		await CustomerService.DeleteCustomer(id);
+		await OnInitializedAsync();
+	}
+	async Task UpdateCustomer(int Id)
+	{
+		navigationManager.NavigateTo($"/UpdateCustomer/{Id}");
+		await OnInitializedAsync();
+
+	}
+
+	async Task AddCustomer()
+	{
+		navigationManager.NavigateTo($"/AddCustomer");
+
+		await OnInitializedAsync();
+
+	}
+}
+

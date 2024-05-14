@@ -1,0 +1,88 @@
+﻿@page "/AddCustomer"
+@using global::Client.ServiceModel
+@using global::Client.ViewModels
+@using global::Shared.Dtos
+@inject NavigationManager navigationManager
+@inject HttpClient Http
+@inject ICustomerService CustomerService
+
+
+
+<h3>Create Customer</h3>
+<hr />
+
+<div class="d-flex justify-content-start">
+    <div class="card" style="width: 600px;">
+        <div class="card-body">
+            <form @onsubmit="AddNewCustomer">
+
+                <div class="form-group" style="margin-bottom: 5px">
+                    <label for="firstName">First Name:</label>
+                    <input type="text" class="form-control" id="firstName" @bind="customer.Name" />
+                </div>
+
+                <div class="form-group" style="margin-bottom: 5px">
+                    <label for="lastName">Last Name:</label>
+                    <input type="text" class="form-control" id="lastName" @bind="customer.Family" />
+                </div>
+
+                <div class="form-group" style="margin-bottom: 5px">
+                    <label for="DateOfBirth">Birth Date:</label>
+                    <input type="date" class="form-control" id="DateOfBirth" @bind="customer.BirthDate" />
+                </div>
+
+                <div class="form-group" style="margin-bottom: 5px">
+                    <label for="CounryCode">Country Code:</label>
+                    <input type="text" class="form-control" id="PhoneNumber" @bind="customer.CountryCode" />
+                </div>
+                <div class="form-group" style="margin-bottom: 5px">
+                    <label for="PhoneNumber">Phone Number:</label>
+                    <input type="text" class="form-control" id="PhoneNumber" @bind="customer.MobileNumber" />
+                </div>
+
+                <div class="form-group" style="margin-bottom: 5px">
+                    <label for="Email">Email:</label>
+                    <input type="text" class="form-control" id="Email" @bind="customer.Email" />
+                </div>
+
+
+                <div class="form-group" style="margin-bottom: 5px">
+                    <label for="BankAccountNumber">Account No:</label>
+                    <input type="text" class="form-control" id="BankAccountNumber" @bind="customer.BankAccounNumber" />
+                </div>
+
+
+                <br />
+                <button type="submit" class="btn btn-primary">Create</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+@code
+    {
+    CustomerDto customer = new CustomerDto();
+    private string Result;
+
+
+    async Task AddNewCustomer()
+    {
+
+        CustomerService.AddCustomer(new CustomerCreateInput
+            {
+                Name = customer.Name,
+                Family = customer.Family,
+                BirthDate = customer.BirthDate != null ? customer.BirthDate : DateTime.MinValue,
+                Email = customer.Email,
+                BankAccounNumber = customer.BankAccounNumber,
+                CountryCode = customer.CountryCode,
+                MobileNumber = customer.MobileNumber
+
+            }
+             );
+
+        navigationManager.NavigateTo($"/customersManager");
+
+    }
+}
+

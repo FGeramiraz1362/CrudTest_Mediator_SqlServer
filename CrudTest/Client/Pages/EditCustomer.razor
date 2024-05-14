@@ -1,0 +1,96 @@
+﻿@page "/UpdateCustomer/{Id:int}"
+@using System.ComponentModel.DataAnnotations
+@using global::Client.ServiceModel
+@using global::Client.ViewModels
+@using global::Shared.Dtos
+@inject NavigationManager navigationManager
+@inject HttpClient Http
+@inject ICustomerService CustomerService
+
+
+<h3>Edit Customer</h3>
+<hr />
+
+
+@if (customer is not null)
+{
+    <div class="form-group" style="margin-bottom: 10px; width:60%">
+        <label for="firstName">First Name</label>
+        <input type="text" class="form-control" id="firstName" @bind="customer.Name" disabled="true" />
+    </div>
+
+    <div class="form-group" style="margin-bottom: 10px; width:60%">
+        <label for="lastName">Last Name</label>
+        <input type="text" class="form-control" id="lastName" @bind="customer.Family" disabled="true" />
+    </div>
+
+    <div class="form-group" style="margin-bottom: 10px; width:60%">
+        <label for="dateOfBirth">Date of Birth</label>
+        <input type="date" class="form-control" id="dateOfBirth" @bind="customer.BirthDate" disabled="true" />
+    </div>
+
+    <div class="form-group" style="margin-bottom: 10px; width:60%">
+        <label for="currencyCode">Currency Code</label>
+        <input type="text" class="form-control" id="phoneNumber" @bind="customer.CountryCode" />
+    </div>
+
+    <div class="form-group" style="margin-bottom: 10px; width:60%">
+        <label for="phoneNumber">Phone Number</label>
+        <input type="text" class="form-control" id="phoneNumber" @bind="customer.MobileNumber" />
+    </div>
+
+    <div class="form-group" style="margin-bottom: 10px; width:60%">
+        <label for="email">Email</label>
+        <input type="email" class="form-control" id="email" @bind="customer.Email" />
+    </div>
+
+    <div class="form-group" style="margin-bottom: 10px; width:60%">
+        <label for="bankAccountNumber">Bank Account Number</label>
+        <input type="text" class="form-control" id="bankAccountNumber" @bind="customer.BankAccounNumber" />
+    </div>
+
+    <button type="button" class="btn btn-primary" @onclick="SaveChanges">Save Changes</button>
+}
+else
+{
+    <p>Loading ...</p>
+}
+
+
+
+@code
+{
+    CustomerDto customer;
+
+    [Required]
+    [Parameter]
+    public int Id { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        customer = await CustomerService.GetCustomerById(Id);
+    }
+
+
+    private async Task SaveChanges()
+    {
+
+        await CustomerService.UpdateCustomer(Id, new CustomerUpdateInput
+            {
+                Id = customer.Id,
+                Name = customer.Name,
+                Family = customer.Family,
+                Email = customer.Email,
+                BirthDate = customer.BirthDate,
+                BankAccounNumber = customer.BankAccounNumber,
+                CountryCode = customer.CountryCode,
+                MobileNumber = customer.MobileNumber,
+
+            });
+
+        navigationManager.NavigateTo($"/customersManager");
+
+    }
+}
+
