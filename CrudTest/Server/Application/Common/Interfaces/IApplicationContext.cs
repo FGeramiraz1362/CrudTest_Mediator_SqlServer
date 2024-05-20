@@ -7,6 +7,8 @@ namespace Application.Common.Interfaces
     public interface IApplicationContext
     {
         public DbSet<CustomerEntity> Customers { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<Role> Roles { get; set; }
 
         Task<int> SaveChangesAsync();
     }

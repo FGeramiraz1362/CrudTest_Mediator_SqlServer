@@ -1,10 +1,11 @@
 ﻿@page "/AddCustomer"
+@using Mc2.CrudTest.Presentation.Client.Repositories.UserRepositories
 @using global::Client.ServiceModel
 @using global::Client.ViewModels
 @using global::Shared.Dtos
 @inject NavigationManager navigationManager
 @inject HttpClient Http
-@inject ICustomerService CustomerService
+@inject ICustomerRepository CustomerService
 
 
 

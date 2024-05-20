@@ -15,12 +15,13 @@ namespace Mc2.CrudTest.Presentation.Server.Models
 
         [Required]
         public string Desciption { get; set; }
-        
-        public string Photo { get; set; }
+
+        public string Photo { get; set; } = null;
         [Required]
-        public int likes { get; set; }
+        public int likes { get; set; } = 0;
         [Required]
-        public int Dislikes { get; set; }
+        public int Dislikes { get; set; } = 0;
+        public virtual User User { get; set; }
 
     }
 }

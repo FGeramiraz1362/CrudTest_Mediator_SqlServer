@@ -9,10 +9,14 @@ namespace Mc2.CrudTest.Presentation.Server.Models
     [Table("Roles")]
     public class Role : BaseEntity
     {
+        
+        
         [Required]
         public string FnCaption { get; set; }
         [Required]
         public string EnCaption { get; set; }
+
+        public virtual ICollection<User> Users { get; set; }
         
 
     }

@@ -12,6 +12,9 @@ namespace Application.Common.Mappings
             CreateMap<CustomerEntity, CustomerDto>().MaxDepth(1)
             .ForMember(dest => dest.MobileNumber, opt => opt.MapFrom(src => src.PhoneNumebr.MobileNumber))
             .ForMember(dest => dest.CountryCode, opt => opt.MapFrom(src => src.PhoneNumebr.CountryCode));
+
+            CreateMap<Role, RoleDto>().MaxDepth(1);
+            CreateMap<User, UserDto>().MaxDepth(1);
         }
 
     }

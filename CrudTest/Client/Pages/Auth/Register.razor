@@ -1,0 +1,49 @@
+﻿@page "/register"
+@using Mc2.CrudTest.Presentation.Client.ServiceModel
+@using global::Client.ServiceModel
+@using global::Shared
+@using global::Shared.Helper
+@inject HttpClient http
+@inject IHttpService httpService
+@inject NavigationManager navigationManager
+@inject IUserAuthService loginService
+
+@* @attribute [Authorize(Roles ="admin")] *@
+
+<h3>Register</h3>
+
+<EditForm Model="userInfo" OnValidSubmit="CreateUser">
+    <DataAnnotationsValidator />
+
+    <div class="form-group">
+        <label>Email:</label>
+        <div>
+            <InputText class="form-control" @bind-Value="@userInfo.Email" />
+            <ValidationMessage For="@(() => userInfo.Email)" />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>Password:</label>
+        <div>
+            <InputPassword class="form-control" @bind-Value="@userInfo.Password" />
+            <ValidationMessage For="@(() => userInfo.Password)" />
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Register</button>
+
+</EditForm>
+
+@code {
+    private UserInfo userInfo = new UserInfo();
+
+    async Task CreateUser()
+    {
+        ResponseData<UserToken> result = await httpService.PostAsync<UserInfo, UserToken>("api/accounts/create", userInfo);
+        UserToken token = result.Response;
+        await loginService.Login(token.Token);
+
+        navigationManager.NavigateTo("");
+    }
+}

@@ -20,6 +20,9 @@ namespace Infrastructure.Repositories
             return await _context.Set<TEntity>().ToListAsync();
         }
 
+        
+
+
         public async Task AddAsync(TEntity entity)
         {
             await _context.Set<TEntity>().AddAsync(entity);

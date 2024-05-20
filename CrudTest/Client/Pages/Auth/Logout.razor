@@ -1,0 +1,15 @@
+﻿@page "/logout"
+@using Mc2.CrudTest.Presentation.Client.ServiceModel
+@inject IUserAuthService loginService
+@inject NavigationManager navigationManager
+
+
+<text>Login out...</text>
+
+@code {
+    protected async override Task OnInitializedAsync()
+    {
+        await loginService.Logout();
+        navigationManager.NavigateTo($"/login");
+    }
+}

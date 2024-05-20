@@ -1,11 +1,14 @@
-﻿using Mc2.CrudTest.Presentation.Server.CustomerFeatures.Commands.Add;
-using Mc2.CrudTest.Presentation.Server.CustomerFeatures.Commands.Delete;
-using Mc2.CrudTest.Presentation.Server.CustomerFeatures.Commands.Edit;
-using Mc2.CrudTest.Presentation.Server.CustomerFeatures.Queries.FindPersonById;
-using Mc2.CrudTest.Presentation.Server.CustomerFeatures.Queries.GetPersonsList;
+﻿using Application.Features.CustomerFeatures.Commands.Add;
+using Application.Features.CustomerFeatures.Commands.Delete;
+using Application.Features.CustomerFeatures.Commands.Edit;
+using Application.Features.CustomerFeatures.Queries.FindCustomerByFilter;
+using Application.Features.CustomerFeatures.Queries.FindCustomerById;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Dtos;
+using Shared.Helper;
+using Web.Helper;
 
 namespace Web.Controllers
 {
@@ -52,19 +55,33 @@ namespace Web.Controllers
         /// Gets all Customers.
         /// </summary>
         /// <returns></returns>
+        /// 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        [AllowAnonymous]
+        public async Task<IActionResult> GetByFiletr([FromQuery] PaginationDTO pagination,
+            [FromQuery] CustomerFilterDto customerFilterDto)
         {
-            try
-            {
+            var result = await mediator.Send(new GetCustomerByFilterQueryModel { CustomerFilterDto = customerFilterDto, PaginationDTO = pagination });
 
-                return Ok(await mediator.Send(new GetAllCustomersQueryModel()));
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e);
-            }
+            await HttpContext.InsertPaginationParameterInResponse(result.Item2, pagination.QuantityPerPage);
+
+            return Ok(result.Item1);
+
         }
+
+        //[HttpGet]
+        //public async Task<IActionResult> GetAll()
+        //{
+        //    try
+        //    {
+
+        //        return Ok(await mediator.Send(new GetAllCustomersQueryModel()));
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        return BadRequest(e);
+        //    }
+        //}
         /// <summary>
         /// Gets Customer Entity by Id.
         /// </summary>

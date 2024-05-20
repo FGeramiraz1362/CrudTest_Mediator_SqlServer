@@ -1,0 +1,86 @@
+﻿@page "/Form"
+@using Mc2.CrudTest.Presentation.Client.Repositories.UserRepositories
+@using global::Client.ServiceModel
+@using global::Client.ViewModels
+@using global::Shared.Dtos
+@inject NavigationManager navigationManager
+@inject HttpClient Http
+
+
+
+@inject HttpClient http
+@inject IRoleRepository roleRepository
+
+
+<h3>Create Customer</h3>
+<hr />
+
+<EditForm Model="User" OnValidSubmit="Submit" dir="rtl">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="form-group">
+        <label>Name:</label>
+        <div>
+            <InputText class="form-control" @bind-Value="@User.Name" />
+            <ValidationMessage For="@(() => User.Name)" />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>LastName:</label>
+        <div>
+            <InputText class="form-control" @bind-Value="@User.LastName" />
+            <ValidationMessage For="@(() => User.LastName)" />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>Password:</label>
+        <div>
+            <InputPassword class="form-control" @bind-Value="@User.Password" />
+            <ValidationMessage For="@(() => User.Password)" />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>Job:</label>
+        <div>
+            <InputText class="form-control" @bind-Value="@User.Job" />
+            <ValidationMessage For="@(() => User.Job)" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label>Email:</label>
+        <div>
+            <InputText  class="form-control" @bind-Value="@User.Email" />
+            <ValidationMessage For="@(() => User.Email)" />
+        </div>
+    </div>
+      
+    <div class="form-group" >
+        <label>Role:</label>
+        <select @bind="@User.RoleId">
+            @if (Roles != null && Roles.Count > 0)
+            {
+                @foreach (var role in Roles)
+                {
+                    <option value="@role.Id">@role.EnCaption</option>
+                }
+            }
+            else
+            {
+                <option value="0">هیچ موردی یافت نشد</option>
+            }
+
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+
+</EditForm>
+
+@code
+{
+
+
+}
+

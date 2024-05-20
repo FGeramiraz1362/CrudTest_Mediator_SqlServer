@@ -1,71 +1,164 @@
 ﻿@page "/customersManager"
-@using System.Net.Http.Json
-@using global::Client.ServiceModel
+@inject HttpClient http
+@inject IJSRuntime js
+@inject ICustomerRepository customerRepository
+
+@using System.IO
+@using System.Text.Json
+@using System.Text
+@using Mc2.CrudTest.Presentation.Client.Repositories.UserRepositories
 @using global::Shared.Dtos
-@inject NavigationManager navigationManager
-@inject HttpClient httpClient
-@inject ICustomerService CustomerService
+<h3>People</h3>
 
-<MudTd><MudButton Variant="Variant.Outlined" Size="Size.Large" OnClick="@(() => AddCustomer())">AddCustomer</MudButton></MudTd>
+<AuthorizeView>
+    <Authorized>
+        <div class="form-group">
+            <a class="btn btn-success" href="AddCustomer">New Customer</a>
+        </div>
+    </Authorized>
+</AuthorizeView>
 
-<MudTable Items="@Customers" Hover="true" Breakpoint="Breakpoint.Sm">
+<div class="form-inline">
+    <label class="sr-only" for="filter-name">Filter</label>
+    <input type="text" class="form-control mb-2 mr-sm-2"
+           @bind="nameFilter"
+           placeholder="Filter by name" />
+    <input type="text" class="form-control mb-2 mr-sm-2"
+           @bind="familyFilter"
+           placeholder="Filter by name" />
+    <button type="button" class="btn btn-primary mr-sm-2 mb-2"
+            @onclick="Filter">Filter</button>
+    <button type="button" class="btn btn-danger mb-2"
+            @onclick="Clear">Clear</button>
+</div>
 
-	<HeaderContent>
-		@* <MudTh >Id</MudTh> *@
-		<MudTh>FirstName</MudTh>
-		<MudTh>LastName</MudTh>
-		<MudTh>Email</MudTh>
-		<MudTh>PhoneNumber_Country</MudTh>
-		<MudTh>PhoneNumber_National</MudTh>
-		<MudTh>BirthDate</MudTh>
-		<MudTh>BankAccountNumber</MudTh>
-	</HeaderContent>
-	<RowTemplate>
-		@* 		<MudTd DataLabel="ID">@context.Id</MudTd>
-		*@			<MudTd DataLabel="FirstName">@context.Name</MudTd>
-		<MudTd DataLabel="LastName">@context.Family</MudTd>
-		<MudTd DataLabel="Email">@context.Email</MudTd>
-		<MudTd DataLabel="PhoneNumber_Country">@context.CountryCode</MudTd>
-		<MudTd DataLabel="PhoneNumber_National">@context.MobileNumber</MudTd>
+<Pagination TotaPagesQuantity="totalPageQuantity" CurrentPage="currentPage" Radius="2"
+            SelectedPage="SelectedPage"></Pagination>
 
-		<MudTd DataLabel="BirthDate">@context.BirthDate.Date</MudTd>
-		<MudTd DataLabel="BankAccountNumber">@context.BankAccounNumber</MudTd>
-		<MudTd><MudButton Variant="Variant.Outlined" Size="Size.Small" OnClick="@(() => DeleteCustomer(context.Id))">Delete</MudButton></MudTd>
-		<MudTd><MudButton Variant="Variant.Outlined" Size="Size.Small" OnClick="@(() => UpdateCustomer(context.Id))">Update</MudButton></MudTd>
+<GenericList Elements="people">
+    <NullTemplate>
+        <img src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif" />
+    </NullTemplate>
+    <WithElementsTemplate>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>FirstName</th>
+                    <th>LastName</th>
+                    <th>Email</th>
+                    <th>PhoneNumber_Country</th>
+                    <th>PhoneNumber_National</th>
+                    <th>BirthDate</th>
+                    <th>BankAccountNumber</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var person in people)
+                {
+                    <tr>
+                        <td>
+                            <AuthorizeView>
+                                <Authorized>
+                                    <a class="btn btn-success" href="UpdateCustomer/@person.Id">Edit</a>
+                                    <button class="btn btn-danger" @onclick="@(() => DeletePerson(person.Id))">Delete</button>
+                                 </Authorized>
+                            </AuthorizeView>
+                        </td>
+                        <td>@person.Name</td>
+                        <td>@person.Family</td>
+                        <td>@person.Email</td>
+                        <td>@person.CountryCode</td>
+                        <td>@person.MobileNumber</td>
+                        <td>@person.BirthDate</td>
+                        <td>@person.BankAccounNumber</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
 
+       @*  <button @onclick="ExportAsCSV">Export as CSV</button> *@
+    </WithElementsTemplate>
+</GenericList>
 
-	</RowTemplate>
-	
-</MudTable>
+<div style="display:none;">
+    <GenericList Elements="people">
+        <WithIndividualElementTemplate Context="person">
+            <div class="card">
+                <div class="card-body">
+                    @person.Name
+                </div>
+            </div>
+        </WithIndividualElementTemplate>
+    </GenericList>
+</div>
 
 @code {
-	private CustomerDto[] Customers;
 
+    List<CustomerDto> people { get; set; }
+    private int totalPageQuantity;
+    private int currentPage = 1;
+    private string nameFilter = "";
+    private string familyFilter = "";
 
-	protected override async Task OnInitializedAsync()//todo:pageing
-	{
-		Customers = await CustomerService.GetCustomers();
-	}
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadPeople();
+    }
 
+    private async Task SelectedPage(int page)
+    {
+        currentPage = page;
+        await LoadPeople(page);
+    }
 
-	async Task DeleteCustomer(int id)
-	{
-		await CustomerService.DeleteCustomer(id);
-		await OnInitializedAsync();
-	}
-	async Task UpdateCustomer(int Id)
-	{
-		navigationManager.NavigateTo($"/UpdateCustomer/{Id}");
-		await OnInitializedAsync();
+    private async Task Filter()
+    {
+        currentPage = 1;
+        await LoadPeople();
+    }
 
-	}
+    private async Task Clear()
+    {
+        nameFilter = string.Empty;
+        currentPage = 1;
+        await LoadPeople();
+    }
 
-	async Task AddCustomer()
-	{
-		navigationManager.NavigateTo($"/AddCustomer");
+    async Task LoadPeople(int page = 1, int quantityPerPage = 2)
+    {
+        var result = await customerRepository.GetCustomers(page, quantityPerPage, nameFilter, familyFilter); //await http.GetFromJsonAsync<List<CustomerDto>>(filter.ToString());
+        people =  result.Item1.Response;
+        totalPageQuantity = result.Item2;
 
-		await OnInitializedAsync();
+    }
 
-	}
+    async Task DeletePerson(int personId)
+    {
+        //await js.DisplayMessage("my title", "My message", SweetAlertMessageType.success);
+        var personSelected = people.First(x => x.Id == personId);
+        //if (await js.Confirm("Confirm", $"Do you want to delete {personSelected.Name}?", SweetAlertMessageType.question))
+        {
+            var result = await customerRepository.DeleteCustomer(personId);
+
+            await LoadPeople();
+        }
+    }
+
+    // private void ExportAsCSV()
+    // {
+    //     using (var memoryStream = new MemoryStream())
+    //     {
+    //         using (var writer = new StreamWriter(memoryStream))
+    //         {
+    //             using (var csv = new CsvHelper.CsvWriter(writer))
+    //             {
+    //                 csv.WriteRecords(people);
+    //             }
+
+    //             var arr = memoryStream.ToArray();
+    //             js.SaveAs("people.csv", arr);
+    //         }
+    //     }
+    // }
 }
-

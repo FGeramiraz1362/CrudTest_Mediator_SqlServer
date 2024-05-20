@@ -1,11 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
 
 namespace Shared.Dtos
 {
 
     public class UserDto
     {
+        public int Id { get; set; }
         [Required]
         public string Name { get; set; }
 
@@ -22,16 +22,19 @@ namespace Shared.Dtos
 
         public string Job { get; set; }
 
-        public string Bio { get; set; }
+        //public string Bio { get; set; }
 
-        public int Age { get; set; }
+        //public int Age { get; set; }
 
-        public int BlogCount { get; set; }
-        [Required]
-        public StatusDto Status { get; set; }
-        [Required]
-        public BlogDto Blog { get; set; }
-        [Required]
-        public RoleDto Role { get; set; }
+        //public int BlogCount { get; set; }
+
+        public int RoleId { get; set; }
+
+ 
+        //public StatusDto Status { get; set; }
+
+        //public BlogDto Blog { get; set; }
+
+        //public RoleDto Role { get; set; }
     }
 }

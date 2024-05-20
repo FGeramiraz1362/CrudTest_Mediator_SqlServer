@@ -33,9 +33,18 @@ namespace Mc2.CrudTest.Presentation.Server.Models
         public int BlogCount { get; set; }
         [Required]
         public virtual Status Status { get; set; }
-        [Required]
-        public virtual Blog Blog { get; set; }
+
         [Required]
         public virtual Role Role { get; set; }
+
+
+        public int RoleId { get; set; }
+
+        public int StatusId { get; set; }
+
+        public virtual ICollection<Blog> Blogs { get; set; }
+
+
+
     }
 }

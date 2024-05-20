@@ -1,11 +1,12 @@
 ﻿@page "/UpdateCustomer/{Id:int}"
+@using Mc2.CrudTest.Presentation.Client.Repositories.UserRepositories
 @using System.ComponentModel.DataAnnotations
 @using global::Client.ServiceModel
 @using global::Client.ViewModels
 @using global::Shared.Dtos
 @inject NavigationManager navigationManager
 @inject HttpClient Http
-@inject ICustomerService CustomerService
+@inject ICustomerRepository CustomerService
 
 
 <h3>Edit Customer</h3>

@@ -17,8 +17,10 @@ namespace Mc2.CrudTest.Presentation.Server.Models
         public string Desciption { get; set; }
 
         public int ReplyTo { get; set; }
+        public int BlogId {  get; set; }
 
         [Required]
         public virtual Blog Blog { get; set; }
+
     }
 }

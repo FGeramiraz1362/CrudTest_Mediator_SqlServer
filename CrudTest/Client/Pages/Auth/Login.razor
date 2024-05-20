@@ -1,0 +1,78 @@
+﻿@page "/login"
+
+@using Mc2.CrudTest.Presentation.Client.ServiceModel
+@using Microsoft.AspNetCore.Components.Authorization
+@using global::Client.ServiceModel
+@using global::Shared.Helper
+
+@inject HttpClient http
+@inject IUserAuthService loginService
+@inject NavigationManager navigationManager
+@inject IHttpService httpService
+@inject AuthRepository AuthRepository
+@inject UserStateService userStateService
+
+@inject ILoggerFactory LoggerFactory
+<h3>Log in</h3>
+
+
+<div>
+   
+    <AuthorizeView>
+        <Authorized>
+            <p class="text-center alert alert-success">Successful login</p>
+        </Authorized>
+        <NotAuthorized>
+            @if (showMessage)
+            {
+                <p class="text-center alert alert-danger">Failed try</p>
+            }
+            else
+            {
+                <p class="text-center alert alert-info">On the progress </p>
+            }
+
+        </NotAuthorized>
+    </AuthorizeView>
+</div>
+
+<EditForm Model="userInfo" OnValidSubmit="LoginUser">
+    <DataAnnotationsValidator />
+    <ValidationSummary  />
+    
+    <div class="form-group">
+        <label>Email:</label>
+        <div>
+            <InputText class="form-control" @bind-Value="@userInfo.Email" />
+            <ValidationMessage For="@(() => userInfo.Email)" />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>Password:</label>
+        <div>
+            <InputPassword class="form-control" @bind-Value="@userInfo.Password" />
+            <ValidationMessage For="@(() => userInfo.Password)" />
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Log in</button>
+
+</EditForm>
+
+@code {
+    private UserInfo userInfo = new UserInfo();
+    bool showMessage = false;
+
+    async Task LoginUser()
+    {
+        Console.WriteLine("salam");
+        UserToken token = await AuthRepository.Login(userInfo);
+        if (token == null)
+            showMessage = true;
+
+        await loginService.Login(token.Token);
+        navigationManager.NavigateTo($"/customersManager");
+
+    }
+}
