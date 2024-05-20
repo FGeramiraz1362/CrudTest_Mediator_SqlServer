@@ -25,7 +25,7 @@ namespace Infrastructure.Repositories.Implements
             if (!string.IsNullOrEmpty(customerFilterDto.Family))
                 queryable = queryable.Where(t => t.Family == customerFilterDto.Family);
 
-            return  new Tuple<List<CustomerEntity>, int> (await queryable.Paginate(pagination).ToListAsync(),await queryable.CountAsync());
+            return  new Tuple<List<CustomerEntity>, int> (await queryable.Paginate(pagination).OrderBy(t=>t.Id).ToListAsync(),await queryable.CountAsync());
 
         }
 
